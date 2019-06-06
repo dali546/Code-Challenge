@@ -1,4 +1,5 @@
 import com.example.Job;
+import com.example.JobDependencyException;
 import com.example.Main;
 import org.junit.Assert;
 import org.junit.Test;
@@ -6,7 +7,7 @@ import org.junit.Test;
 public class JobTest {
 
     @Test
-    public void EmptyResponseTest() {
+    public void EmptyResponseTest() throws JobDependencyException {
         // Arrange, Act, Assert
         Job[] jobs = new Job[0]; // Empty Job Array
 
@@ -18,7 +19,7 @@ public class JobTest {
     }
 
     @Test
-    public void SingleJobResponseTest() {
+    public void SingleJobResponseTest() throws JobDependencyException {
         Job[] jobs = new Job[]{new Job("a")}; // Single Item Job Array
 
         String response = Main.runJobs(jobs);
@@ -27,7 +28,7 @@ public class JobTest {
     }
 
     @Test
-    public void RunMultipleJobsTest() {
+    public void RunMultipleJobsTest() throws JobDependencyException {
         Job a = new Job("a");
         Job b = new Job("b");
         Job c = new Job("c");
@@ -42,7 +43,7 @@ public class JobTest {
     }
 
     @Test
-    public void RunJobsInSpecifiedOrder() {
+    public void RunJobsInSpecifiedOrderTest() throws JobDependencyException {
         Job a = new Job("a");
         Job c = new Job("c");
         Job b = new Job("b", c);
@@ -55,7 +56,7 @@ public class JobTest {
     }
 
     @Test
-    public void MoreComplicatedJobDependencyOrder() {
+    public void MoreComplicatedJobDependencyOrderTest() throws JobDependencyException {
         Job a = new Job("a");
         Job f = new Job("f");
         Job c = new Job("c", f);
@@ -72,5 +73,16 @@ public class JobTest {
         Assert.assertTrue(response.contains("cb")); // Specified Order
         Assert.assertTrue(response.contains("be")); // Specified Order
         Assert.assertTrue(response.contains("fcbe")); // Specified Order
+    }
+
+    @Test(expected = JobDependencyException.class)
+    public void ErrorOnSelfDependentJobsTest() throws JobDependencyException {
+        Job a = new Job("a");
+        Job b = new Job("b");
+        Job c = new Job("c", new Job("c")); // Job dependent on Job "c"
+        Job[] jobs = new Job[]{a, b, c}; // Add Jobs to array of jobs
+
+        Main.runJobs(jobs); // Expected JobDependencyException
+
     }
 }
