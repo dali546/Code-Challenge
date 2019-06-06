@@ -21,7 +21,19 @@ public class JobTest {
         String[] jobs = new String[]{"a"}; // Single Item Job Array
 
         String response = Main.runJobs(jobs);
-        
-        Assert.assertEquals(response,"a");
+
+        Assert.assertEquals(response, "a");
+    }
+
+    @Test
+    public void RunMultipleJobsTest() {
+        String[] jobs = new String[]{"a", "b", "c"};
+
+        String response = Main.runJobs(jobs);
+
+        Assert.assertTrue(response.contains("a"));
+        Assert.assertTrue(response.contains("b"));
+        Assert.assertTrue(response.contains("c"));
+        Assert.assertEquals(response.length(), jobs.length);
     }
 }
