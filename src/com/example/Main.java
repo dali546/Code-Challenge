@@ -11,9 +11,17 @@ public class Main {
     }
 
     public static String runJobs(String[] jobs) {
-        String seq = "Sequence: ";
+        StringBuilder seq = new StringBuilder();
 
-        return jobs.length == 0 ? "" : seq;
+        for (String job : jobs) {
+            seq.append(runJob(job));
+        }
+
+        return jobs.length == 0 ? "" : seq.toString();
+    }
+
+    private static String runJob(String job) {
+        return job;
     }
 
 }
