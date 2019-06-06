@@ -1,3 +1,4 @@
+import com.example.Job;
 import com.example.Main;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,7 +8,7 @@ public class JobTest {
     @Test
     public void EmptyResponseTest() {
         // Arrange, Act, Assert
-        String[] jobs = new String[0]; // Empty Job Array
+        Job[] jobs = new Job[0]; // Empty Job Array
 
         // Run Job with Empty Job Array
         String response = Main.runJobs(jobs);
@@ -18,7 +19,7 @@ public class JobTest {
 
     @Test
     public void SingleJobResponseTest() {
-        String[] jobs = new String[]{"a"}; // Single Item Job Array
+        Job[] jobs = new Job[]{new Job("a")}; // Single Item Job Array
 
         String response = Main.runJobs(jobs);
 
@@ -27,7 +28,10 @@ public class JobTest {
 
     @Test
     public void RunMultipleJobsTest() {
-        String[] jobs = new String[]{"a", "b", "c"};
+        Job a = new Job("a");
+        Job b = new Job("b");
+        Job c = new Job("c");
+        Job[] jobs = new Job[]{a, b, c};
 
         String response = Main.runJobs(jobs);
 
@@ -35,5 +39,18 @@ public class JobTest {
         Assert.assertTrue(response.contains("b"));
         Assert.assertTrue(response.contains("c"));
         Assert.assertEquals(response.length(), jobs.length);
+    }
+
+    @Test
+    public void RunJobsInSpecifiedOrder() {
+        Job a = new Job("a");
+        Job c = new Job("c");
+        Job b = new Job("b", c);
+        Job[] jobs = new Job[]{a, b, c}; // Add Jobs to array of jobs
+
+        String response = Main.runJobs(jobs);
+
+        Assert.assertTrue(response.contains("a"));
+        Assert.assertTrue(response.contains("cb")); // Specified Order
     }
 }
