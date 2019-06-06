@@ -53,4 +53,24 @@ public class JobTest {
         Assert.assertTrue(response.contains("a"));
         Assert.assertTrue(response.contains("cb")); // Specified Order
     }
+
+    @Test
+    public void MoreComplicatedJobDependencyOrder() {
+        Job a = new Job("a");
+        Job f = new Job("f");
+        Job c = new Job("c", f);
+        Job b = new Job("b", c);
+        Job d = new Job("d", a);
+        Job e = new Job("e", b);
+        Job[] jobs = new Job[]{a, b, c, d, e, f}; // Add Jobs to array of jobs
+
+        String response = Main.runJobs(jobs);
+
+        Assert.assertTrue(response.contains("a"));
+        Assert.assertTrue(response.contains("f"));
+        Assert.assertTrue(response.contains("fc")); // Specified Order
+        Assert.assertTrue(response.contains("cb")); // Specified Order
+        Assert.assertTrue(response.contains("be")); // Specified Order
+        Assert.assertTrue(response.contains("fcbe")); // Specified Order
+    }
 }
