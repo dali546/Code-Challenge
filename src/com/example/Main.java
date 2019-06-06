@@ -41,29 +41,29 @@ public class Main {
     }
 
     private static boolean validateJobListIsFinite(Job[] jobs) {
-
-        Set<String> chain;
-        for (Job job : jobs) {
-            chain = new TreeSet<>();
-            chain.add(job.getJob());
-            if (checkJobDependentsIsInChain(job, chain)) { // If duplicate found exit and return false
-                return false;
-            }
-        }
-        return true;
+        return Arrays.stream(jobs) // For Each Job
+                .allMatch(job ->   // Make sure no job has a chain of looping dependents
+                        isJobDependencyChainAValidChain(job, ofSet(job))// Initialise the chain-set with root Job
+                );
     }
 
-    private static boolean checkJobDependentsIsInChain(Job job, Set<String> chain) {
-        if (job.getDependentOn() == null) {
-            return false; // Not dependent on anything... therefore no loop
-        } else {
-            if (chain.contains(job.getDependentOn().getJob())) {
-                return true;
-            } else {
-                chain.add(job.getDependentOn().getJob());
-                return checkJobDependentsIsInChain(job.getDependentOn(), chain);
-            }
+    private static boolean isJobDependencyChainAValidChain(Job job, HashSet<String> chain) {
+        // Returns true if a valid chain -- no loop
+        if (job.getDependentOn() != null) {
+
+            if (chain.contains(job.getDependentOn().getJob()))
+                return false; // If chain has dependent already, return false.
+
+            // If Chain Does NOT contain the dependent
+            chain.add(job.getDependentOn().getJob()); // Add the dependent to the chain
+            return isJobDependencyChainAValidChain(job.getDependentOn(), chain); // Repeat
         }
+        return true; // null dependent. Not dependent on anything... therefore no loop
     }
 
+    private static HashSet<String> ofSet(Job job) {
+        HashSet<String> set = new HashSet<>();
+        set.add(job.getJob());
+        return set;
+    }
 }
