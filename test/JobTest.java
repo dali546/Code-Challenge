@@ -1,5 +1,6 @@
 import com.example.Job;
 import com.example.JobDependencyException;
+import com.example.JobDependencyLoopException;
 import com.example.Main;
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,5 +85,18 @@ public class JobTest {
 
         Main.runJobs(jobs); // Expected JobDependencyException
 
+    }
+
+    @Test(expected = JobDependencyLoopException.class)
+    public void ErrorOnLoopingDependeciesTest() throws JobDependencyException {
+        Job a = new Job("a");
+        Job b = new Job("b", new Job("c")); // Cannot compile with variable c.
+        Job f = new Job("f", b);
+        Job c = new Job("c", f); // Job dependent on Job "c"
+        Job d = new Job("d", a);
+        Job e = new Job("e");
+        Job[] jobs = new Job[]{a, b, c, d, e, f}; // Add Jobs to array of jobs
+
+        Main.runJobs(jobs); // Expected JobDependencyLoopException
     }
 }
